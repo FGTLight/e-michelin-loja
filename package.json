@@ -1,0 +1,49 @@
+{
+  "name": "e-michelin-loja",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Loja virtual da E Michelin e Cia — materiais de construção e hidráulica em Erechim/RS",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "images:generate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-product-images.ts",
+    "db:seed:generate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-seed.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@mercadopago/sdk-react": "^1.0.7",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.90.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.18.2",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.544.0",
+    "next": "14.2.35",
+    "papaparse": "^5.5.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "^7.62.0",
+    "recharts": "^2.15.4",
+    "resend": "^6.1.0",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^2.6.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "@types/papaparse": "^5.3.16",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.2"
+  }
+}

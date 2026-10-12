@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: 6rem;
+  }
+  body {
+    @apply bg-cimento-50 font-sans text-cimento-950 antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display font-extrabold tracking-tight text-petroleo-950;
+  }
+  :focus-visible {
+    @apply outline-none ring-[3px] ring-seguranca-500 ring-offset-2 ring-offset-white;
+  }
+  ::selection {
+    @apply bg-seguranca-200 text-petroleo-950;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold transition
+      duration-200 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[.98];
+  }
+  /* Laranja de segurança com texto petróleo-950: contraste 6,5:1 (AA) */
+  .btn-primary { @apply btn bg-seguranca-500 text-petroleo-950 shadow-sm hover:bg-seguranca-400; }
+  .btn-dark { @apply btn bg-petroleo-900 text-white hover:bg-petroleo-800; }
+  .btn-outline { @apply btn border-2 border-petroleo-900 text-petroleo-900 hover:bg-petroleo-900 hover:text-white; }
+  .btn-ghost { @apply btn text-petroleo-900 hover:bg-petroleo-50; }
+  .input {
+    @apply w-full rounded-lg border border-cimento-300 bg-white px-3.5 py-2.5 text-sm text-cimento-950
+      placeholder:text-cimento-600 transition focus:border-petroleo-600 focus:outline-none focus:ring-2 focus:ring-petroleo-200
+      aria-[invalid=true]:border-red-600 aria-[invalid=true]:ring-red-100;
+  }
+  .label { @apply mb-1 block text-sm font-semibold text-cimento-800; }
+  .field-error { @apply mt-1 text-xs font-medium text-red-700; }
+  .card { @apply rounded-2xl bg-white shadow-card; }
+  .section-title { @apply text-2xl sm:text-3xl lg:text-4xl; }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[.2em] text-seguranca-700; }
+  .skeleton { @apply relative overflow-hidden rounded-lg bg-cimento-200; }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent;
+  }
+  /* Faixa de obra (zebrada) */
+  .hazard {
+    background-image: repeating-linear-gradient(-45deg, theme(colors.seguranca.500) 0 14px, theme(colors.petroleo.950) 14px 28px);
+  }
+}
+
+@layer utilities {
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .text-balance { text-wrap: balance; }
+}
+
+/* Camadas da casa do hero ficam ocultas até o GSAP assumir (só quando há JS e movimento permitido) */
+.motion-ok .hero-layer {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
