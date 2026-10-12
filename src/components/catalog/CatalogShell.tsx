@@ -36,6 +36,16 @@ export function CatalogShell({
   const params = useSearchParams();
   const [pending, startTransition] = useTransition();
   const [drawer, setDrawer] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    if (!pending) {
+      setShowSkeleton(false);
+      return;
+    }
+    const t = setTimeout(() => setShowSkeleton(true), 180);
+    return () => clearTimeout(t);
+  }, [pending]);
 
   useEffect(() => setDrawer(false), [params]);
 
@@ -66,10 +76,15 @@ export function CatalogShell({
             {toolbar}
           </div>
           <div aria-busy={pending} aria-live="polite">
-            {pending ? (
+            {showSkeleton ? (
               <ProductGridSkeleton count={8} />
             ) : (
-              <motion.div key={params.toString()} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+              <motion.div
+                key={params.toString()}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: pending ? 0.6 : 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
                 {children}
               </motion.div>
             )}

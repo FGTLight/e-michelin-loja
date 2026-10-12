@@ -53,7 +53,7 @@ export function AddressBook({ customerId, addresses }: { customerId: string | nu
   return (
     <div>
       <ul className="grid gap-4 sm:grid-cols-2">
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {addresses.map((a) => (
             <motion.li key={a.id} layout exit={{ opacity: 0, scale: 0.95 }} className="card relative p-5">
               {a.is_default && <span className="absolute right-4 top-4 rounded-full bg-seguranca-100 px-2 py-0.5 text-xs font-bold text-seguranca-800">Padrão</span>}

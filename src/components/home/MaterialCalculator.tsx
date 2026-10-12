@@ -185,7 +185,7 @@ export function MaterialCalculator({ products }: { products: Product[] }) {
               <p className="text-sm font-semibold text-petroleo-100">Você vai precisar de</p>
             </div>
             <ul className="flex-1 divide-y divide-cimento-100 px-5 sm:px-7">
-              <AnimatePresence initial={false}>
+              <AnimatePresence initial={false} mode="popLayout">
                 {lines.map((l) => (
                   <motion.li key={`${mode}-${l.sku}`} layout initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex items-center gap-4 py-3.5">
                     <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-cimento-100">

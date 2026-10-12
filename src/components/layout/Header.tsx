@@ -35,7 +35,7 @@ export function Header({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 36);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -47,9 +47,10 @@ export function Header({ categories }: { categories: Category[] }) {
   }, [mobileOpen]);
 
   return (
-    <header className={cn('sticky top-0 z-40 bg-white transition-shadow duration-300', scrolled && 'shadow-card')}>
+    <header className={cn('sticky -top-9 z-40 bg-white transition-shadow duration-300', scrolled && 'shadow-card')}>
       {/* Barra superior */}
-      <div id="header-topbar" className={cn('overflow-hidden bg-petroleo-950 text-petroleo-100 transition-all duration-300', scrolled ? 'max-h-0' : 'max-h-10')}>
+      {/* Barra fixa de 36px (h-9): com o header sticky em -top-9 ela some rolando, sem animar altura */}
+      <div id="header-topbar" className="h-9 overflow-hidden bg-petroleo-950 text-petroleo-100">
         <div className="container flex h-9 items-center justify-between gap-4 text-xs">
           <p className="flex items-center gap-2 truncate">
             <Truck className="h-3.5 w-3.5 text-seguranca-400" aria-hidden />
@@ -139,7 +140,7 @@ export function Header({ categories }: { categories: Category[] }) {
       <AnimatePresence>
         {mobileOpen && (
           <>
-            <motion.div className="fixed inset-0 z-50 bg-petroleo-950/60 backdrop-blur-sm lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMobileOpen(false)} />
+            <motion.div className="fixed inset-0 z-50 bg-petroleo-950/60 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMobileOpen(false)} />
             <motion.aside
               role="dialog"
               aria-modal="true"

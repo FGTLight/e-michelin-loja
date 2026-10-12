@@ -68,7 +68,7 @@ export function CartDrawer() {
       {cartOpen && mounted && (
         <>
           <motion.div
-            className="fixed inset-0 z-50 bg-petroleo-950/50 backdrop-blur-[2px]"
+            className="fixed inset-0 z-50 bg-petroleo-950/50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -120,15 +120,15 @@ export function CartDrawer() {
                   </div>
                 </div>
 
-                <ul className="flex-1 divide-y divide-cimento-100 overflow-y-auto px-5">
-                  <AnimatePresence initial={false}>
+                <motion.ul layoutScroll className="flex-1 divide-y divide-cimento-100 overflow-y-auto px-5">
+                  <AnimatePresence initial={false} mode="popLayout">
                     {items.map((i) => (
                       <motion.li
                         key={i.productId}
                         layout
                         initial={{ opacity: 0, x: 40 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 60, height: 0, paddingTop: 0, paddingBottom: 0 }}
+                        exit={{ opacity: 0, x: 60, transition: { duration: 0.18 } }}
                         transition={{ duration: 0.25 }}
                         className="flex gap-3 overflow-hidden py-4"
                       >
@@ -155,7 +155,7 @@ export function CartDrawer() {
                       </motion.li>
                     ))}
                   </AnimatePresence>
-                </ul>
+                </motion.ul>
 
                 <div className="border-t border-cimento-200 p-5">
                   <div className="flex items-baseline justify-between">

@@ -68,10 +68,11 @@ export function MegaMenu({ categories }: { categories: Category[] }) {
         {open && (
           <motion.div
             id={id}
-            initial={{ opacity: 0, y: 10, clipPath: 'inset(0 0 100% 0 round 16px)' }}
-            animate={{ opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0 round 16px)' }}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            style={{ transformOrigin: 'top left' }}
             className="absolute left-0 top-full z-50 mt-2 w-[min(92vw,960px)] rounded-2xl bg-white p-6 shadow-lift ring-1 ring-cimento-200"
           >
             <div className="grid grid-cols-[1fr_240px] gap-6">

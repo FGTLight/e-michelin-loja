@@ -24,7 +24,7 @@ export function WishlistView() {
   }
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {items.map((i) => (
           <motion.li key={i.productId} layout exit={{ opacity: 0, scale: 0.9 }} className="card flex gap-4 p-4">
             <Link href={`/produto/${i.slug}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-cimento-100">

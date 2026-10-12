@@ -8,6 +8,8 @@
   }
   html {
     -webkit-tap-highlight-color: transparent;
+    /* Reserva o espaço da barra de rolagem: abrir carrinho/menus (overflow hidden) não desloca a página */
+    scrollbar-gutter: stable;
     scroll-padding-top: 6rem;
   }
   body {

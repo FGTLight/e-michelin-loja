@@ -88,7 +88,7 @@ export function QuoteForm() {
         <p className="mt-1 text-sm text-cimento-700">Adicione produtos pelo site (botão “lista de orçamento”) ou digite itens livremente.</p>
 
         <ul className="mt-5 divide-y divide-cimento-100">
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} mode="popLayout">
             {items.map((i) => (
               <motion.li key={i.key} layout initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 40 }} className="flex flex-wrap items-center gap-3 py-3">
                 <p className="min-w-0 flex-1 text-sm font-semibold text-petroleo-950">{i.description}{i.sku && <span className="ml-2 text-xs font-normal text-cimento-600">{i.sku}</span>}</p>

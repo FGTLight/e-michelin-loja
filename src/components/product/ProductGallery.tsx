@@ -2,19 +2,36 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { ProductImage } from '@/types';
 
-/** Galeria com miniaturas, troca animada e zoom que segue o cursor (desktop). */
+/**
+ * Galeria com miniaturas, troca animada e zoom que segue o cursor (desktop).
+ * O zoom atualiza variáveis CSS direto no elemento (sem setState no mousemove), então não trava.
+ */
 export const ProductGallery = forwardRef<HTMLDivElement, { images: ProductImage[]; name: string }>(function ProductGallery({ images, name }, ref) {
   const [index, setIndex] = useState(0);
-  const [zoom, setZoom] = useState<{ x: number; y: number } | null>(null);
+  const zoomBox = useRef<HTMLDivElement>(null);
+  const frame = useRef(0);
   const current = images[index];
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const box = zoomBox.current;
+    if (!box) return;
     const r = e.currentTarget.getBoundingClientRect();
-    setZoom({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top) / r.height) * 100;
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      box.style.setProperty('--zx', `${x}%`);
+      box.style.setProperty('--zy', `${y}%`);
+      box.dataset.zoom = 'on';
+    });
+  };
+  const onLeave = () => {
+    cancelAnimationFrame(frame.current);
+    if (zoomBox.current) zoomBox.current.dataset.zoom = 'off';
   };
 
   return (
@@ -41,23 +58,31 @@ export const ProductGallery = forwardRef<HTMLDivElement, { images: ProductImage[
         ref={ref}
         className="relative aspect-square flex-1 cursor-zoom-in overflow-hidden rounded-2xl bg-white shadow-card"
         onMouseMove={onMove}
-        onMouseLeave={() => setZoom(null)}
+        onMouseLeave={onLeave}
       >
-        <AnimatePresence mode="popLayout" initial={false}>
-          {current && (
-            <motion.div key={current.url} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
-              <Image
-                src={current.url}
-                alt={current.alt ?? name}
-                fill
-                priority={index === 0}
-                sizes="(min-width:1024px) 560px, 100vw"
-                className="object-cover transition-transform duration-200"
-                style={zoom ? { transform: 'scale(1.9)', transformOrigin: `${zoom.x}% ${zoom.y}%` } : undefined}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div ref={zoomBox} data-zoom="off" className="group/zoom absolute inset-0">
+          <AnimatePresence initial={false}>
+            {current && (
+              <motion.div
+                key={current.url}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Image
+                  src={current.url}
+                  alt={current.alt ?? name}
+                  fill
+                  priority={index === 0}
+                  sizes="(min-width:1024px) 560px, 100vw"
+                  className="object-cover transition-transform duration-200 ease-out [transform-origin:var(--zx,50%)_var(--zy,50%)] group-data-[zoom=on]/zoom:scale-[1.9]"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

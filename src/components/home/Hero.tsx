@@ -4,11 +4,13 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, ClipboardList, ShieldCheck, Truck } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { site } from '@/config/site';
 import { cn } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
+// No celular a barra de endereço muda a altura da janela ao rolar; sem isto o pin recalcula e "pula"
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
@@ -30,72 +32,80 @@ export function Hero() {
   const [animated, setAnimated] = useState(false);
 
   useIsoLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
+    // matchMedia com escopo na seção: seletores ficam restritos ao hero e revert() limpa tudo
+    // (tweens, pin e estilos inline) ao sair da página — evita pins "fantasmas" ao navegar.
+    const mm = gsap.matchMedia(section.current ?? undefined);
 
-      mm.add('(prefers-reduced-motion: no-preference)', () => {
-        setAnimated(true);
-        setStage(0);
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      setAnimated(true);
+      setStage(0);
 
-        const isMobile = window.matchMedia('(max-width: 1023px)').matches;
-        // Fixa o hero logo abaixo do header sticky (a barra superior do header recolhe ao rolar)
-        const headerOffset = () => {
-          const header = document.querySelector('header');
-          const topBar = document.getElementById('header-topbar');
-          return (header?.offsetHeight ?? 0) - (topBar?.offsetHeight ?? 0);
-        };
-        const tl = gsap.timeline({
-          defaults: { ease: 'power2.out' },
-          scrollTrigger: {
-            trigger: section.current,
-            start: () => `top ${headerOffset()}px`,
-            invalidateOnRefresh: true,
-            end: isMobile ? '+=120%' : '+=170%',
-            scrub: 0.8,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
-
-        tl.addLabel('fundacao')
-          .from('.h-footing', { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 0%', stagger: 0.06, duration: 0.4 })
-          .from('.h-slab', { scaleX: 0, autoAlpha: 0, transformOrigin: '0% 50%', duration: 0.5 }, '-=0.2')
-          .addLabel('paredes')
-          .from('.h-row', { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 100%', stagger: 0.09, duration: 0.25 })
-          .from('.h-opening', { autoAlpha: 0, scale: 0.4, transformOrigin: '50% 50%', stagger: 0.1, duration: 0.3 })
-          .addLabel('tubulacao')
-          .fromTo(
-            '.h-pipe',
-            { autoAlpha: 1, strokeDashoffset: (_: number, el: SVGPathElement) => el.getTotalLength(), strokeDasharray: (_: number, el: SVGPathElement) => el.getTotalLength() },
-            { strokeDashoffset: 0, stagger: 0.12, duration: 0.7, ease: 'none' },
-          )
-          .from('.h-fixture', { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%', stagger: 0.08, duration: 0.25, ease: 'back.out(3)' })
-          .addLabel('telhado')
-          .from('.h-chimney', { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 100%', duration: 0.2 })
-          .from('.h-roof', { y: -260, autoAlpha: 0, duration: 0.7, ease: 'bounce.out' }, '<')
-          .from('.h-tile', { opacity: 0, x: -14, stagger: 0.05, duration: 0.2 })
-          .from('.h-done', { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.35, ease: 'back.out(2.5)' })
-          .to({}, { duration: 0.3 }); // respiro no fim antes de soltar o pin
-
-        const marks = ['paredes', 'tubulacao', 'telhado'].map((l) => tl.labels[l]);
-        let current = 0;
-        tl.eventCallback('onUpdate', () => {
-          const t = tl.time();
-          const s = marks.filter((m) => t >= m).length;
-          if (s !== current) {
-            current = s;
-            setStage(s);
-          }
-        });
+      // Fixa o hero logo abaixo da parte visível do header sticky (a barra superior sai rolando)
+      const headerOffset = () => {
+        const header = document.querySelector('header');
+        const topBar = document.getElementById('header-topbar');
+        return (header?.offsetHeight ?? 0) - (topBar?.offsetHeight ?? 0);
+      };
+      const tl = gsap.timeline({
+        defaults: { ease: 'power2.out' },
+        scrollTrigger: {
+          trigger: section.current,
+          start: () => `top ${headerOffset()}px`,
+          end: () => (window.innerWidth < 1024 ? '+=120%' : '+=170%'),
+          invalidateOnRefresh: true,
+          scrub: 0.6,
+          pin: true,
+          anticipatePin: 1,
+          fastScrollEnd: true,
+        },
       });
 
-      mm.add('(prefers-reduced-motion: reduce)', () => {
-        setAnimated(false);
-        setStage(3);
-      });
-    }, section);
+      tl.addLabel('fundacao')
+        .from('.h-footing', { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 0%', stagger: 0.06, duration: 0.4 })
+        .from('.h-slab', { scaleX: 0, autoAlpha: 0, transformOrigin: '0% 50%', duration: 0.5 }, '-=0.2')
+        .addLabel('paredes')
+        .from('.h-row', { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 100%', stagger: 0.09, duration: 0.25 })
+        .from('.h-opening', { autoAlpha: 0, scale: 0.4, transformOrigin: '50% 50%', stagger: 0.1, duration: 0.3 })
+        .addLabel('tubulacao')
+        .fromTo(
+          '.h-pipe',
+          { autoAlpha: 1, strokeDashoffset: (_: number, el: SVGPathElement) => el.getTotalLength(), strokeDasharray: (_: number, el: SVGPathElement) => el.getTotalLength() },
+          { strokeDashoffset: 0, stagger: 0.12, duration: 0.7, ease: 'none' },
+        )
+        .from('.h-fixture', { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%', stagger: 0.08, duration: 0.25, ease: 'back.out(2)' })
+        .addLabel('telhado')
+        .from('.h-chimney', { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 100%', duration: 0.2 })
+        // back.out em vez de bounce: com scrub (indo e voltando no scroll) o bounce dava trancos
+        .from('.h-roof', { y: -220, autoAlpha: 0, duration: 0.7, ease: 'back.out(1.4)' }, '<')
+        .from('.h-tile', { opacity: 0, x: -14, stagger: 0.05, duration: 0.2 })
+        .from('.h-done', { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.35, ease: 'back.out(2)' })
+        .to({}, { duration: 0.3 }); // respiro no fim antes de soltar o pin
 
-    return () => ctx.revert();
+      const marks = ['paredes', 'tubulacao', 'telhado'].map((l) => tl.labels[l]);
+      let current = 0;
+      tl.eventCallback('onUpdate', () => {
+        const s = marks.filter((m) => tl.time() >= m).length;
+        if (s !== current) {
+          current = s;
+          setStage(s);
+        }
+      });
+    });
+
+    mm.add('(prefers-reduced-motion: reduce)', () => {
+      setAnimated(false);
+      setStage(3);
+    });
+
+    // Fontes e imagens mudam a altura da página depois do primeiro cálculo: recalcula posições
+    const refresh = () => ScrollTrigger.refresh();
+    document.fonts?.ready.then(refresh).catch(() => {});
+    window.addEventListener('load', refresh, { once: true });
+
+    return () => {
+      window.removeEventListener('load', refresh);
+      mm.revert();
+    };
   }, []);
 
   const years = new Date().getFullYear() - site.foundedYear;
@@ -165,7 +175,7 @@ export function Hero() {
   );
 }
 
-function HouseSvg() {
+const HouseSvg = memo(function HouseSvg() {
   const rows = Array.from({ length: 9 }, (_, i) => 390 - i * 20);
   return (
     <svg viewBox="0 0 600 500" className="h-auto w-full" role="img" aria-label="Ilustração de uma casa sendo construída em camadas: fundação, paredes, tubulações e telhado">
@@ -244,4 +254,4 @@ function HouseSvg() {
       </g>
     </svg>
   );
-}
+});
