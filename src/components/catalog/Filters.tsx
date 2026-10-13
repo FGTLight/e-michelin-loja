@@ -17,8 +17,12 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 
 export function Filters({ categories, brands }: { categories: Category[]; brands: Brand[] }) {
   const params = useSearchParams();
-  const { setParams } = useCatalog();
+  const { setParams, closeFilters } = useCatalog();
   const categoria = params.get('categoria');
+  const pickCategory = (slug: string | null) => {
+    closeFilters();
+    setParams({ categoria: slug });
+  };
   const marcas = (params.get('marca') ?? '').split(',').filter(Boolean);
   const [min, setMin] = useState(params.get('min') ?? '');
   const [max, setMax] = useState(params.get('max') ?? '');
@@ -40,7 +44,7 @@ export function Filters({ categories, brands }: { categories: Category[]; brands
       <Group title="Categoria">
         <ul className="space-y-1">
           <li>
-            <button type="button" onClick={() => setParams({ categoria: null })} className={cn('w-full rounded-lg px-3 py-2 text-left text-sm transition', !categoria ? 'bg-petroleo-900 font-bold text-white' : 'text-cimento-800 hover:bg-cimento-100')} aria-pressed={!categoria}>
+            <button type="button" onClick={() => pickCategory(null)} className={cn('w-full rounded-lg px-3 py-2 text-left text-sm transition', !categoria ? 'bg-petroleo-900 font-bold text-white' : 'text-cimento-800 hover:bg-cimento-100')} aria-pressed={!categoria}>
               Todas
             </button>
           </li>
@@ -48,7 +52,7 @@ export function Filters({ categories, brands }: { categories: Category[]; brands
             <li key={c.id}>
               <button
                 type="button"
-                onClick={() => setParams({ categoria: c.slug })}
+                onClick={() => pickCategory(c.slug)}
                 aria-pressed={categoria === c.slug}
                 className={cn('w-full rounded-lg px-3 py-2 text-left text-sm transition', categoria === c.slug ? 'bg-petroleo-900 font-bold text-white' : 'text-cimento-800 hover:bg-cimento-100')}
               >

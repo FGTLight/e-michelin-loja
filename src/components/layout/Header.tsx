@@ -150,6 +150,9 @@ export function Header({ categories }: { categories: Category[] }) {
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 380, damping: 38 }}
               className="fixed inset-y-0 left-0 z-50 flex w-[86vw] max-w-sm flex-col overflow-y-auto bg-white lg:hidden"
+              // Fecha ao tocar em qualquer link: trocar de categoria em /produtos só muda a query string,
+              // então o efeito por pathname sozinho não fechava o menu
+              onClick={(e) => (e.target as HTMLElement).closest('a') && setMobileOpen(false)}
             >
               <div className="flex items-center justify-between border-b border-cimento-200 p-4">
                 <Logo />

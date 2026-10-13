@@ -73,6 +73,7 @@ export function MegaMenu({ categories }: { categories: Category[] }) {
             exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformOrigin: 'top left' }}
+            onClick={(e) => (e.target as HTMLElement).closest('a') && setOpen(false)}
             className="absolute left-0 top-full z-50 mt-2 w-[min(92vw,960px)] rounded-2xl bg-white p-6 shadow-lift ring-1 ring-cimento-200"
           >
             <div className="grid grid-cols-[1fr_240px] gap-6">

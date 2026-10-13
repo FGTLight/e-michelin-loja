@@ -11,9 +11,10 @@ import { Filters } from './Filters';
 interface Ctx {
   pending: boolean;
   setParams: (patch: Record<string, string | null>) => void;
+  closeFilters: () => void;
 }
 
-const CatalogContext = createContext<Ctx>({ pending: false, setParams: () => {} });
+const CatalogContext = createContext<Ctx>({ pending: false, setParams: () => {}, closeFilters: () => {} });
 export const useCatalog = () => useContext(CatalogContext);
 
 /**
@@ -59,7 +60,7 @@ export function CatalogShell({
   const activeCount = ['categoria', 'marca', 'min', 'max', 'disponivel', 'ofertas'].filter((k) => params.get(k)).length;
 
   return (
-    <CatalogContext.Provider value={{ pending, setParams }}>
+    <CatalogContext.Provider value={{ pending, setParams, closeFilters: () => setDrawer(false) }}>
       <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
         <aside className="hidden lg:block" aria-label="Filtros">
           <div className="sticky top-36">
