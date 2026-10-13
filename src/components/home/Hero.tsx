@@ -97,13 +97,13 @@ export function Hero() {
       setStage(3);
     });
 
-    // Fontes e imagens mudam a altura da página depois do primeiro cálculo: recalcula posições
-    const refresh = () => ScrollTrigger.refresh();
-    document.fonts?.ready.then(refresh).catch(() => {});
-    window.addEventListener('load', refresh, { once: true });
+    // As fontes mudam a altura do texto depois do primeiro cálculo: recalcula uma vez quando carregam.
+    // (Sem refresh no "load": ele podia cair no meio do scroll e soltar o pin por um instante.)
+    let alive = true;
+    document.fonts?.ready.then(() => alive && ScrollTrigger.refresh()).catch(() => {});
 
     return () => {
-      window.removeEventListener('load', refresh);
+      alive = false;
       mm.revert();
     };
   }, []);
@@ -111,67 +111,70 @@ export function Hero() {
   const years = new Date().getFullYear() - site.foundedYear;
 
   return (
-    <section
-      ref={section}
-      className="relative overflow-hidden bg-petroleo-950 text-white"
-      aria-labelledby="hero-title"
-      style={{
-        backgroundImage:
-          'linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)',
-        backgroundSize: '32px 32px',
-      }}
-    >
-      <div className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-petroleo-600/30 blur-3xl" aria-hidden />
-      <div className="container relative grid min-h-[calc(100svh-150px)] items-center gap-8 py-10 lg:grid-cols-[1fr_1.1fr] lg:py-14">
-        <div>
-          <p style={{ animationDelay: '0ms' }} className="animate-rise eyebrow !text-seguranca-400">Há {years} anos construindo Erechim</p>
-          <h1 id="hero-title" style={{ animationDelay: '80ms' }} className="animate-rise mt-3 text-balance text-4xl !text-white sm:text-5xl xl:text-6xl">
-            Tudo para a sua obra, <span className="text-seguranca-400">da fundação ao telhado.</span>
-          </h1>
-          <p style={{ animationDelay: '160ms' }} className="animate-rise mt-5 max-w-xl text-base leading-relaxed text-petroleo-100 sm:text-lg">
-            Cimento, hidráulica, elétrica, ferramentas e tintas com preço justo, estoque de verdade e entrega rápida em Erechim e região.
-          </p>
-          <div style={{ animationDelay: '240ms' }} className="animate-rise mt-8 flex flex-wrap gap-3">
-            <Link href="/produtos" className="btn-primary px-6 py-3.5 text-base">
-              Ver produtos <ArrowRight className="h-5 w-5" aria-hidden />
-            </Link>
-            <Link href="/orcamento" className="btn border-2 border-white/30 px-6 py-3.5 text-base text-white hover:border-white hover:bg-white hover:text-petroleo-950">
-              <ClipboardList className="h-5 w-5" aria-hidden /> Pedir orçamento
-            </Link>
-          </div>
-          <ul style={{ animationDelay: '320ms' }} className="animate-rise mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-petroleo-100">
-            <li className="flex items-center gap-2"><Truck className="h-4 w-4 text-seguranca-400" aria-hidden /> Entrega em até 1 dia útil em Erechim</li>
-            <li className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-seguranca-400" aria-hidden /> Pix, cartão em até {site.maxInstallments}x e boleto</li>
-          </ul>
-        </div>
-
-        <div className="relative">
-          <HouseSvg />
-          <ol className="mt-2 grid grid-cols-4 gap-1.5 sm:gap-2" aria-label="Etapas da obra">
-            {stages.map((s, i) => (
-              <li key={s.label}>
-                <Link
-                  href={s.href}
-                  className={cn(
-                    'block rounded-lg border px-2 py-2 text-center text-[11px] font-bold transition-colors duration-300 sm:text-xs',
-                    i <= stage ? 'border-seguranca-500 bg-seguranca-500 text-petroleo-950' : 'border-white/20 text-petroleo-200',
-                  )}
-                  aria-current={i === stage ? 'step' : undefined}
-                >
-                  <span className="mr-1 opacity-70">{i + 1}.</span>
-                  {s.label}
-                </Link>
-              </li>
-            ))}
-          </ol>
-          {animated && (
-            <p className="mt-3 text-center text-xs text-petroleo-200" aria-hidden>
-              Role a página para construir a casa ↓
+    // Fundo escuro também no wrapper: o espaço reservado pelo pin (pin-spacer) nunca aparece branco
+    <div className="bg-petroleo-950">
+      <section
+        ref={section}
+        className="relative overflow-hidden bg-petroleo-950 text-white"
+        aria-labelledby="hero-title"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      >
+        <div className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-petroleo-600/30 blur-3xl" aria-hidden />
+        <div className="container relative grid min-h-[calc(100svh-150px)] items-center gap-8 py-10 lg:grid-cols-[1fr_1.1fr] lg:py-14">
+          <div>
+            <p style={{ animationDelay: '0ms' }} className="animate-rise eyebrow !text-seguranca-400">Há {years} anos construindo Erechim</p>
+            <h1 id="hero-title" style={{ animationDelay: '80ms' }} className="animate-rise mt-3 text-balance text-4xl !text-white sm:text-5xl xl:text-6xl">
+              Tudo para a sua obra, <span className="text-seguranca-400">da fundação ao telhado.</span>
+            </h1>
+            <p style={{ animationDelay: '160ms' }} className="animate-rise mt-5 max-w-xl text-base leading-relaxed text-petroleo-100 sm:text-lg">
+              Cimento, hidráulica, elétrica, ferramentas e tintas com preço justo, estoque de verdade e entrega rápida em Erechim e região.
             </p>
-          )}
+            <div style={{ animationDelay: '240ms' }} className="animate-rise mt-8 flex flex-wrap gap-3">
+              <Link href="/produtos" className="btn-primary px-6 py-3.5 text-base">
+                Ver produtos <ArrowRight className="h-5 w-5" aria-hidden />
+              </Link>
+              <Link href="/orcamento" className="btn border-2 border-white/30 px-6 py-3.5 text-base text-white hover:border-white hover:bg-white hover:text-petroleo-950">
+                <ClipboardList className="h-5 w-5" aria-hidden /> Pedir orçamento
+              </Link>
+            </div>
+            <ul style={{ animationDelay: '320ms' }} className="animate-rise mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-petroleo-100">
+              <li className="flex items-center gap-2"><Truck className="h-4 w-4 text-seguranca-400" aria-hidden /> Entrega em até 1 dia útil em Erechim</li>
+              <li className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-seguranca-400" aria-hidden /> Pix, cartão em até {site.maxInstallments}x e boleto</li>
+            </ul>
+          </div>
+  
+          <div className="relative">
+            <HouseSvg />
+            <ol className="mt-2 grid grid-cols-4 gap-1.5 sm:gap-2" aria-label="Etapas da obra">
+              {stages.map((s, i) => (
+                <li key={s.label}>
+                  <Link
+                    href={s.href}
+                    className={cn(
+                      'block rounded-lg border px-2 py-2 text-center text-[11px] font-bold transition-colors duration-300 sm:text-xs',
+                      i <= stage ? 'border-seguranca-500 bg-seguranca-500 text-petroleo-950' : 'border-white/20 text-petroleo-200',
+                    )}
+                    aria-current={i === stage ? 'step' : undefined}
+                  >
+                    <span className="mr-1 opacity-70">{i + 1}.</span>
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+            {animated && (
+              <p className="mt-3 text-center text-xs text-petroleo-200" aria-hidden>
+                Role a página para construir a casa ↓
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
 

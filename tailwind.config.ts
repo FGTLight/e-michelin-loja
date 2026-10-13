@@ -33,7 +33,8 @@ const config: Config = {
       keyframes: {
         marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
         shimmer: { '100%': { transform: 'translateX(100%)' } },
-        'page-in': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },
+        // Só opacidade: um transform no wrapper da página quebraria o position: fixed do pin do hero (GSAP)
+        'page-in': { from: { opacity: '0' }, to: { opacity: '1' } },
         rise: { from: { opacity: '0', transform: 'translateY(24px)' }, to: { opacity: '1', transform: 'none' } },
         'pulse-ring': {
           '0%': { transform: 'scale(.9)', opacity: '.7' },
@@ -43,7 +44,8 @@ const config: Config = {
       animation: {
         marquee: 'marquee 40s linear infinite',
         shimmer: 'shimmer 1.4s infinite',
-        'page-in': 'page-in .28s cubic-bezier(.22,1,.36,1) both',
+        // fill-mode backwards: ao terminar, nenhum efeito da animação fica ativo no wrapper
+        'page-in': 'page-in .25s ease-out backwards',
         rise: 'rise .7s cubic-bezier(.22,1,.36,1) both',
         'pulse-ring': 'pulse-ring 2.2s cubic-bezier(.2,.6,.4,1) infinite',
       },
