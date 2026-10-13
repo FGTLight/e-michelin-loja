@@ -46,12 +46,18 @@ export function Hero() {
         const topBar = document.getElementById('header-topbar');
         return (header?.offsetHeight ?? 0) - (topBar?.offsetHeight ?? 0);
       };
+      const isMobile = () => window.innerWidth < 1024;
+      // Altura visível sob o header: no mobile o bloco da casa ocupa exatamente esse espaço
+      const syncHeaderVar = () => section.current?.style.setProperty('--hv', `${headerOffset()}px`);
+      syncHeaderVar();
+      ScrollTrigger.addEventListener('refreshInit', syncHeaderVar);
       const tl = gsap.timeline({
         defaults: { ease: 'power2.out' },
         scrollTrigger: {
           trigger: section.current,
-          start: () => `top ${headerOffset()}px`,
-          end: () => (window.innerWidth < 1024 ? '+=120%' : '+=170%'),
+          // Mobile: o texto passa no scroll normal e o pin começa quando a casa preenche a tela
+          start: () => (isMobile() ? 'bottom bottom' : `top ${headerOffset()}px`),
+          end: () => (isMobile() ? '+=120%' : '+=170%'),
           invalidateOnRefresh: true,
           scrub: 0.6,
           pin: true,
@@ -81,6 +87,8 @@ export function Hero() {
         .from('.h-done', { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.35, ease: 'back.out(2)' })
         .to({}, { duration: 0.3 }); // respiro no fim antes de soltar o pin
 
+      const cleanupVar = () => ScrollTrigger.removeEventListener('refreshInit', syncHeaderVar);
+
       const marks = ['paredes', 'tubulacao', 'telhado'].map((l) => tl.labels[l]);
       let current = 0;
       tl.eventCallback('onUpdate', () => {
@@ -90,6 +98,8 @@ export function Hero() {
           setStage(s);
         }
       });
+
+      return cleanupVar;
     });
 
     mm.add('(prefers-reduced-motion: reduce)', () => {
@@ -147,7 +157,7 @@ export function Hero() {
             </ul>
           </div>
   
-          <div className="relative">
+          <div className="relative flex min-h-[calc(100svh-var(--hv,124px)-2.5rem)] flex-col justify-center lg:block lg:min-h-0">
             <HouseSvg />
             <ol className="mt-2 grid grid-cols-4 gap-1.5 sm:gap-2" aria-label="Etapas da obra">
               {stages.map((s, i) => (
